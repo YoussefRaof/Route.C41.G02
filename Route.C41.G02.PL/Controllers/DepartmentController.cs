@@ -21,7 +21,8 @@ namespace Route.C41.G02.PL.Controllers
         // BaseUrl : Depatment/Index
         public IActionResult Index()
         {
-            return View();
+            var departments = _departmentsRepo.GetAll();
+            return View(departments);
         }
 
     }
