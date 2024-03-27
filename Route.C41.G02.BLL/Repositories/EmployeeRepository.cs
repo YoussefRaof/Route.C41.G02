@@ -10,44 +10,17 @@ using System.Threading.Tasks;
 
 namespace Route.C41.G02.BLL.Repositories
 {
-    public class EmployeeRepository : IEmployeeRepository
+    public class EmployeeRepository : GenericRepository<Empolyee> , IEmployeeRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        //private readonly ApplicationDbContext dbContext;
 
-        public EmployeeRepository(ApplicationDbContext dbContext) // Ask CLR For Creating Object Of "ApplicationDbContext" Impilicity
+        public EmployeeRepository(ApplicationDbContext dbContext):base(dbContext)   
         {
-            _dbContext = dbContext;
-            /*_dbContext*/ /*= new ApplicationDbContext(new Microsoft.EntityFrameworkCore.DbContextOptions<ApplicationDbContext>);*/
+            //this.dbContext = dbContext;
         }
-        public int Add(Empolyee entity)
+        public IQueryable<Empolyee> GetEmployeeByAddress(string Address)
         {
-            _dbContext.Add(entity);
-            return _dbContext.SaveChanges();
+            return _dbContext.Empolyees.Where(E => E.Address.ToLower() == Address.ToLower()); 
         }
-        public int Update(Empolyee entity)
-        {
-            _dbContext.Update(entity);
-            return _dbContext.SaveChanges();
-        }
-
-        public int Delete(Empolyee entity)
-        {
-            _dbContext.Remove(entity);
-            return _dbContext.SaveChanges();
-        }
-
-        public Empolyee Get(int id)
-        {
-            var Empolyee = _dbContext.Empolyees.Find(id);
-            ///var Empolyee = _dbContext.Empolyees.Local.Where(D=> D.Id == id).FirstOrDefault();
-            ///if(Empolyee is null)
-            ///    Empolyee = _dbContext.Empolyees.Where(D => D.Id == id).FirstOrDefault();
-
-            return Empolyee;
-        }
-
-        public IEnumerable<Empolyee> GetAll()
-            => _dbContext.Empolyees.AsNoTracking().ToList();
-
     }
 }

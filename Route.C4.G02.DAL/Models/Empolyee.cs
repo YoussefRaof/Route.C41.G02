@@ -25,9 +25,9 @@ namespace Route.C4.G02.DAL.Models
         [EnumMember(Value = "PartTime")]
         PartTime = 2
     }
-    public class Empolyee
+    public class Empolyee:ModelBase
     {
-        public int Id { get; set; }
+        
 
         [Required]
         [MaxLength(50, ErrorMessage = "Max Length Of Name Is 50 Chars")]
