@@ -25,5 +25,6 @@ namespace Route.C4.G02.DAL.Data
         }
 
         public DbSet<Department> Departments{ get; set; }
+        public DbSet<Empolyee> Empolyees { get; set; }
     }
 }
