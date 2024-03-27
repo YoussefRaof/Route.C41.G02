@@ -44,6 +44,7 @@ namespace Route.C41.G02.PL
             });
 
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             
             
         }
