@@ -20,6 +20,7 @@ namespace Route.C41.G02.PL.Controllers
 
         public IActionResult Index()
         {
+            TempData.Keep();
             // Binding Through View Dictionary : Transfer Extra Data From Action To Viee [One Way]
 
             // 1. ViewData
@@ -46,8 +47,15 @@ namespace Route.C41.G02.PL.Controllers
                 var count = _employeesRepo.Add(empolyee);
                 if (count > 0)
                 {
-                    return RedirectToAction("Index");
+                    TempData["Message"] = "Employee Created Successfully";
+                   
                 }
+                else
+                {
+                    TempData["Message"] = "Error, Employee Is Not Created :(";
+                    
+                }
+                return RedirectToAction("Index");
 
 
             }
