@@ -3,7 +3,19 @@
 
 @{
     ViewData["Title"] = "Index";
-}
+
+    string ViewDataMessage = ViewData["Message"] as string; // Compiler Enforces Type Safety => Requires Type Conversion [Stronglty Typed]
+    string ViewBagMessage = ViewBag.Message; // Can Not Enforce Type Safety => No Required Type Conversion [Weakly Typed]
+} 
+
+@* <div class="alert alert-warning">
+
+    @ViewData["Message"]
+</div>
+
+<div class="alert alert-success">
+    @ViewBag.Message
+</div> *@
 
 <h1>All Employees</h1>
 <br />

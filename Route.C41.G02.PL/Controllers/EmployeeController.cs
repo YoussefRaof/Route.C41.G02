@@ -20,6 +20,13 @@ namespace Route.C41.G02.PL.Controllers
 
         public IActionResult Index()
         {
+            // Binding Through View Dictionary : Transfer Extra Data From Action To Viee [One Way]
+
+            // 1. ViewData
+            ViewData["Message"] = "Hello From Index";
+
+            ViewBag.Message = "Hello View Bag";
+
             var departments = _employeesRepo.GetAll();
             return View(departments);
         }
