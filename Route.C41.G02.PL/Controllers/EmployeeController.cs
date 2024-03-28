@@ -3,28 +3,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
-using Route.C41.G02.BLL.Repositories;
 using System;
 
 namespace Route.C41.G02.PL.Controllers
 {
-    // Inheritance: DepartmentController Is A Controller
-    // Compostion: DepartmentController Has A DepartmentRepository
-    public class DepartmentController : Controller
+    public class EmployeeController : Controller
     {
-        private readonly IDepartmentRepository _departmentsRepo;  //NULL
+        private readonly IEmployeeRepository _employeesRepo;  //NULL
         private readonly IWebHostEnvironment _env;
 
-        public DepartmentController(IDepartmentRepository departmentsRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public EmployeeController(IEmployeeRepository employeesRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
-            _departmentsRepo = departmentsRepo;
+            _employeesRepo = employeesRepo;
             _env = env;
         }
 
-        // BaseUrl : Depatment/Index
         public IActionResult Index()
         {
-            var departments = _departmentsRepo.GetAll();
+            var departments = _employeesRepo.GetAll();
             return View(departments);
         }
 
@@ -36,18 +32,19 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(Department department)
+        public IActionResult Create(Empolyee empolyee)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                var count = _departmentsRepo.Add(department);
+                var count = _employeesRepo.Add(empolyee);
                 if (count > 0)
                 {
                     return RedirectToAction("Index");
                 }
 
+
             }
-            return View(department);
+            return View(empolyee);
         }
 
         [HttpGet]
@@ -56,29 +53,20 @@ namespace Route.C41.G02.PL.Controllers
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var department = _departmentsRepo.Get(id.Value);
+            var empolyee = _employeesRepo.Get(id.Value);
 
-            if (department is null)
+            if (empolyee is null)
                 return NotFound(); // 404
 
-            return View(department);
+            return View(empolyee);
 
         }
 
         [HttpGet]
-        // /Department/Edit/10
-        // /Department/Edit/
+
         public IActionResult Edit(int? id)
         {
-            ///if(!id.HasValue)
-            ///    return BadRequest();
-            ///
-            ///var department = _departmentsRepo.Get(id.Value);
-            ///
-            ///if (department is null)
-            ///    return NotFound(); // 404
-            ///
-            ///return View(department);
+
 
 
             return Details(id, "Edit");
@@ -87,16 +75,16 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Department department)
+        public IActionResult Edit([FromRoute] int id, Empolyee empolyee)
         {
-            if (id != department.Id)
+            if (id != empolyee.Id)
                 return BadRequest();
             if (!ModelState.IsValid)
-                return View(department);
+                return View(empolyee);
 
             try
             {
-                _departmentsRepo.Update(department);
+                _employeesRepo.Update(empolyee);
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -106,28 +94,27 @@ namespace Route.C41.G02.PL.Controllers
                 if (_env.IsDevelopment())
                     ModelState.AddModelError(string.Empty, Ex.Message);
                 else
-                    ModelState.AddModelError(string.Empty, "Error Occured During Updating Department");
+                    ModelState.AddModelError(string.Empty, "Error Occured During Updating Employee");
 
 
-                return View(department);
+                return View(empolyee);
 
             }
         }
 
-        //: /Department/Delete/10
-        //: /Department/Delete/
         [HttpGet]
         public IActionResult Delete(int? id)
         {
             return Details(id, "Delete");
+
         }
 
         [HttpPost]
-        public IActionResult Delete(Department department)
+        public IActionResult Delete(Empolyee empolyee)
         {
             try
             {
-                _departmentsRepo.Delete(department);
+                _employeesRepo.Delete(empolyee);
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -140,11 +127,9 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Deleting Department");
 
 
-                return View(department);
+                return View(empolyee);
 
             }
         }
-
-
     }
 }
