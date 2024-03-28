@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Data;
 using Route.C41.G02.BLL.Interfaces;
 using Route.C41.G02.BLL.Repositories;
+using Route.C41.G02.PL.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,8 +44,7 @@ namespace Route.C41.G02.PL
 
             });
 
-            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddApplicationServices();
             
             
         }
