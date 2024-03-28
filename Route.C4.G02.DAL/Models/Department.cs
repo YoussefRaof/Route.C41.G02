@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,5 +20,10 @@ namespace Route.C4.G02.DAL.Models
 
         [Display(Name = "Date Of Creation")]
         public DateTime DateOfCreation { get; set; }
+
+        // Navigational Propert [MANY]
+
+        //[InverseProperty("Department")]
+        public ICollection<Empolyee> Empolyees { get; set; } = new HashSet<Empolyee>(); 
     }
 }

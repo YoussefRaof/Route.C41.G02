@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -67,6 +68,13 @@ namespace Route.C4.G02.DAL.Models
         public DateTime CreationDate { get; set; } = DateTime.Now;
 
         public bool IsDeleted { get; set; } = false;
+
+        //[ForeignKey("Department")]
+        public int? DepartmentId { get; set; } // Foregin Key Column
+
+        //[InverseProperty("Employees")]
+        // Navigational Property => [ONE]
+        public Department Department { get; set; }
 
     }
 }
