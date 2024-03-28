@@ -30,7 +30,7 @@ namespace Route.C4.G02.DAL.Models
         
 
         [Required]
-        [MaxLength(50, ErrorMessage = "Max Length Of Name Is 50 Chars")]
+        [MaxLength(50, ErrorMessage = "Min Length Of Name Is 5 Chars")]
         [MinLength(5, ErrorMessage = "Max Length Of Name Is 50 Chars")]
         public string Name { get; set; }
 
