@@ -10,11 +10,13 @@ namespace Route.C41.G02.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository _employeesRepo;  //NULL
+        //private readonly IDepartmentRepository _departmentRepo;
         private readonly IWebHostEnvironment _env;
 
-        public EmployeeController(IEmployeeRepository employeesRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public EmployeeController(IEmployeeRepository employeesRepo, /*IDepartmentRepository departmentRepo, */IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
             _employeesRepo = employeesRepo;
+            //_departmentRepo = departmentRepo;
             _env = env;
         }
 
@@ -28,13 +30,15 @@ namespace Route.C41.G02.PL.Controllers
 
             ViewBag.Message = "Hello View Bag";
 
-            var departments = _employeesRepo.GetAll();
-            return View(departments);
+            var empolyees = _employeesRepo.GetAll();
+            return View(empolyees);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
+            //ViewData["Departments"] = _departmentRepo.GetAll();
+            //ViewBag.Departments = _departmentRepo.GetAll(); ;
             return View();
         }
 
@@ -81,7 +85,8 @@ namespace Route.C41.G02.PL.Controllers
 
         public IActionResult Edit(int? id)
         {
-
+            //ViewData["Departments"] = _departmentRepo.GetAll();
+            //ViewBag.Departments = _departmentRepo.GetAll(); ;
 
 
             return Details(id, "Edit");

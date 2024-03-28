@@ -23,7 +23,7 @@ namespace Route.C4.G02.DAL.Models
 
         // Navigational Propert [MANY]
 
-        //[InverseProperty("Department")]
+        [InverseProperty("Department")]
         public ICollection<Empolyee> Empolyees { get; set; } = new HashSet<Empolyee>(); 
     }
 }

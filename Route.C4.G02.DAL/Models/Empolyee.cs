@@ -69,10 +69,10 @@ namespace Route.C4.G02.DAL.Models
 
         public bool IsDeleted { get; set; } = false;
 
-        //[ForeignKey("Department")]
-        public int? DepartmentId { get; set; } // Foregin Key Column
+        //[ForeignKey("DepartmentId")]
+        public int? DepartmentId1 { get; set; } // Foregin Key Column
 
-        //[InverseProperty("Employees")]
+        [InverseProperty("Empolyees")]
         // Navigational Property => [ONE]
         public Department Department { get; set; }
 

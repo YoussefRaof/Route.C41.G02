@@ -19,8 +19,8 @@ namespace Route.C4.G02.DAL.Data.Configurations
             builder.Property(D => D.Name).HasColumnType("varchar").HasMaxLength(50).IsRequired();
             builder.Property(D => D.Code).HasColumnType("varchar").HasMaxLength(50).IsRequired();
             builder.HasMany(D => D.Empolyees)
-                   .WithOne()
-                   .HasForeignKey(E => E.DepartmentId)
+                   .WithOne(E => E.Department)
+                   .HasForeignKey(E => E.DepartmentId1)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
