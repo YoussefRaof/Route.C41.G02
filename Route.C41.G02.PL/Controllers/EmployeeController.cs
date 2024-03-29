@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
 using System;
+using System.Linq;
 
 namespace Route.C41.G02.PL.Controllers
 {
@@ -20,18 +22,28 @@ namespace Route.C41.G02.PL.Controllers
             _env = env;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string SearchInp)
         {
             TempData.Keep();
             // Binding Through View Dictionary : Transfer Extra Data From Action To Viee [One Way]
 
             // 1. ViewData
-            ViewData["Message"] = "Hello From Index";
+            //ViewData["Message"] = "Hello From Index";
 
-            ViewBag.Message = "Hello View Bag";
+            //ViewBag.Message = "Hello View Bag";
+            var empolyees = Enumerable.Empty<Empolyee>();
+            if (string.IsNullOrEmpty(SearchInp))
+                empolyees = _employeesRepo.GetAll();
 
-            var empolyees = _employeesRepo.GetAll();
+
+            else
+                empolyees = _employeesRepo.SearchByName(SearchInp.ToLower());
+
+
+
             return View(empolyees);
+
+
         }
 
         [HttpGet]
@@ -52,12 +64,12 @@ namespace Route.C41.G02.PL.Controllers
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee Created Successfully";
-                   
+
                 }
                 else
                 {
                     TempData["Message"] = "Error, Employee Is Not Created :(";
-                    
+
                 }
                 return RedirectToAction("Index");
 
