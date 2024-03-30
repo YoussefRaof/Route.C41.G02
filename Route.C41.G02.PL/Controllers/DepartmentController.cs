@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
 using Route.C41.G02.BLL.Repositories;
+using Route.C41.G02.PL.ViewModels;
 using System;
+using System.Collections.Generic;
 
 namespace Route.C41.G02.PL.Controllers
 {
@@ -12,11 +15,13 @@ namespace Route.C41.G02.PL.Controllers
     // Compostion: DepartmentController Has A DepartmentRepository
     public class DepartmentController : Controller
     {
+        private readonly IMapper _mapper;
         private readonly IDepartmentRepository _departmentsRepo;  //NULL
         private readonly IWebHostEnvironment _env;
 
-        public DepartmentController(IDepartmentRepository departmentsRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public DepartmentController(IMapper mapper,IDepartmentRepository departmentsRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
+            _mapper = mapper;
             _departmentsRepo = departmentsRepo;
             _env = env;
         }
@@ -25,7 +30,8 @@ namespace Route.C41.G02.PL.Controllers
         public IActionResult Index()
         {
             var departments = _departmentsRepo.GetAll();
-            return View(departments);
+            var MappedDeps = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(departments);
+            return View(MappedDeps);
         }
 
         [HttpGet]
@@ -36,18 +42,19 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(Department department)
+        public IActionResult Create(DepartmentViewModel departmentVm)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                var count = _departmentsRepo.Add(department);
+                var MappedDep = _mapper.Map<DepartmentViewModel,Department>(departmentVm);
+                var count = _departmentsRepo.Add(MappedDep);
                 if (count > 0)
                 {
                     return RedirectToAction("Index");
                 }
 
             }
-            return View(department);
+            return View(departmentVm);
         }
 
         [HttpGet]
@@ -57,11 +64,13 @@ namespace Route.C41.G02.PL.Controllers
                 return BadRequest(); //400
 
             var department = _departmentsRepo.Get(id.Value);
+            var MappedDep = _mapper.Map<Department, DepartmentViewModel>(department);
+
 
             if (department is null)
                 return NotFound(); // 404
 
-            return View(department);
+            return View(MappedDep);
 
         }
 
@@ -87,16 +96,18 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Department department)
+        public IActionResult Edit([FromRoute] int id, DepartmentViewModel departmentVm)
         {
-            if (id != department.Id)
+            if (id != departmentVm.Id)
                 return BadRequest();
             if (!ModelState.IsValid)
-                return View(department);
+                return View(departmentVm);
 
             try
             {
-                _departmentsRepo.Update(department);
+                var MappedEmp = _mapper.Map<DepartmentViewModel, Department>(departmentVm);
+
+                _departmentsRepo.Update(MappedEmp);
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -108,8 +119,8 @@ namespace Route.C41.G02.PL.Controllers
                 else
                     ModelState.AddModelError(string.Empty, "Error Occured During Updating Department");
 
-
-                return View(department);
+                
+                return View(departmentVm);
 
             }
         }
@@ -123,11 +134,12 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(Department department)
+        public IActionResult Delete(DepartmentViewModel departmentVm)
         {
             try
             {
-                _departmentsRepo.Delete(department);
+                var Mapped = _mapper.Map<DepartmentViewModel, Department>(departmentVm);
+                _departmentsRepo.Delete(Mapped);    
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -140,7 +152,7 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Deleting Department");
 
 
-                return View(department);
+                return View(departmentVm);
 
             }
         }

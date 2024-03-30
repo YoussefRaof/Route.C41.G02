@@ -1,22 +1,27 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
+using Route.C41.G02.PL.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Route.C41.G02.PL.Controllers
 {
     public class EmployeeController : Controller
     {
+        private readonly IMapper _mapper;
         private readonly IEmployeeRepository _employeesRepo;  //NULL
         //private readonly IDepartmentRepository _departmentRepo;
         private readonly IWebHostEnvironment _env;
 
-        public EmployeeController(IEmployeeRepository employeesRepo, /*IDepartmentRepository departmentRepo, */IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public EmployeeController(IMapper mapper ,IEmployeeRepository employeesRepo, /*IDepartmentRepository departmentRepo, */IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
+           _mapper = mapper;
             _employeesRepo = employeesRepo;
             //_departmentRepo = departmentRepo;
             _env = env;
@@ -39,9 +44,9 @@ namespace Route.C41.G02.PL.Controllers
             else
                 empolyees = _employeesRepo.SearchByName(SearchInp.ToLower());
 
+            var MappedEmps =_mapper.Map<IEnumerable<Empolyee>,IEnumerable<EmployeeViewModel>>(empolyees);
 
-
-            return View(empolyees);
+            return View(MappedEmps);
 
 
         }
@@ -56,11 +61,38 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(Empolyee empolyee)
+        public IActionResult Create(EmployeeViewModel empolyeeVM)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                var count = _employeesRepo.Add(empolyee);
+
+                // Manual Mapping
+
+               /// var mappedEmp = new Empolyee()
+               /// {
+               ///     Name = empolyeeVM.Name,
+               ///     Age = empolyeeVM.Age,
+               ///     Address = empolyeeVM.Address,
+               ///     Salary = empolyeeVM.Salary,
+               ///     Email = empolyeeVM.Email,
+               ///     PhoneNumber = empolyeeVM.PhoneNumber,
+               ///     IsActive = empolyeeVM.IsActive,
+               ///     HiringDate =  empolyeeVM.HiringDate,
+               ///
+               ///
+               /// };
+               /// 
+
+
+
+
+
+
+
+              var mappedEmp = _mapper.Map<EmployeeViewModel,Empolyee>(empolyeeVM);
+               
+
+                var count = _employeesRepo.Add(mappedEmp);
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee Created Successfully";
@@ -75,7 +107,7 @@ namespace Route.C41.G02.PL.Controllers
 
 
             }
-            return View(empolyee);
+            return View(empolyeeVM);
         }
 
         [HttpGet]
@@ -85,11 +117,12 @@ namespace Route.C41.G02.PL.Controllers
                 return BadRequest(); //400
 
             var empolyee = _employeesRepo.Get(id.Value);
+            var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
 
             if (empolyee is null)
                 return NotFound(); // 404
 
-            return View(empolyee);
+            return View(mappedEmp);
 
         }
 
@@ -107,16 +140,17 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Empolyee empolyee)
+        public IActionResult Edit([FromRoute] int id, EmployeeViewModel empolyeeVm)
         {
-            if (id != empolyee.Id)
+            if (id != empolyeeVm.Id)
                 return BadRequest();
             if (!ModelState.IsValid)
-                return View(empolyee);
+                return View(empolyeeVm);
 
             try
             {
-                _employeesRepo.Update(empolyee);
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
+                _employeesRepo.Update(mappedEmp);
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -129,7 +163,7 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Updating Employee");
 
 
-                return View(empolyee);
+                return View(empolyeeVm);
 
             }
         }
@@ -142,11 +176,14 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(Empolyee empolyee)
+        public IActionResult Delete(EmployeeViewModel empolyeeVm)
         {
             try
             {
-                _employeesRepo.Delete(empolyee);
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
+
+
+                _employeesRepo.Delete(mappedEmp);
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -159,7 +196,7 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Deleting Department");
 
 
-                return View(empolyee);
+                return View(empolyeeVm);
 
             }
         }
