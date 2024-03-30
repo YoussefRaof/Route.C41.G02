@@ -12,7 +12,7 @@ namespace Route.C41.G02.BLL.Repositories
 {
     public class DepartmentRepository :GenericRepository<Department> , IDepartmentRepository
     {
-        public DepartmentRepository(ApplicationDbContext dbContext):base(dbContext)  // Ask CLR For Creating ApplicationDbContext Object 
+        public DepartmentRepository(ApplicationDbContext dbContext):base(dbContext)  
         {
             
         }

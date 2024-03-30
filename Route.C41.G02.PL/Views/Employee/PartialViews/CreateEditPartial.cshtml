@@ -2,9 +2,9 @@
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@inject IDepartmentRepository _departmentRepo
+@inject IUniitOfWork uniitofwork
 @{
-    var departments = new SelectList(_departmentRepo.GetAll(), "Id", "Name");
+    var departments = new SelectList(uniitofwork.DepartmentRepository.GetAll(), "Id", "Name");
 }
 <div class="form-group">
     <label class="col-form-label" asp-for="Name"></label>

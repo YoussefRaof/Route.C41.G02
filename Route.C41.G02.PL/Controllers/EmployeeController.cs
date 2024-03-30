@@ -15,14 +15,21 @@ namespace Route.C41.G02.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IMapper _mapper;
-        private readonly IEmployeeRepository _employeesRepo;  //NULL
+        private readonly IUniitOfWork _uniitOfWork;
+        //private readonly IEmployeeRepository _employeesRepo;  //NULL
         //private readonly IDepartmentRepository _departmentRepo;
         private readonly IWebHostEnvironment _env;
 
-        public EmployeeController(IMapper mapper ,IEmployeeRepository employeesRepo, /*IDepartmentRepository departmentRepo, */IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public EmployeeController(IMapper mapper,
+            IUniitOfWork uniitOfWork,
+            //IEmployeeRepository employeesRepo,
+            /*IDepartmentRepository departmentRepo, */
+            IWebHostEnvironment env) 
+            //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
-           _mapper = mapper;
-            _employeesRepo = employeesRepo;
+            _mapper = mapper;
+            _uniitOfWork = uniitOfWork;
+            //_employeesRepo = employeesRepo;
             //_departmentRepo = departmentRepo;
             _env = env;
         }
@@ -38,13 +45,13 @@ namespace Route.C41.G02.PL.Controllers
             //ViewBag.Message = "Hello View Bag";
             var empolyees = Enumerable.Empty<Empolyee>();
             if (string.IsNullOrEmpty(SearchInp))
-                empolyees = _employeesRepo.GetAll();
+                empolyees = _uniitOfWork.EmployeeRepository.GetAll();
 
 
             else
-                empolyees = _employeesRepo.SearchByName(SearchInp.ToLower());
+                empolyees = _uniitOfWork.EmployeeRepository.SearchByName(SearchInp.ToLower());
 
-            var MappedEmps =_mapper.Map<IEnumerable<Empolyee>,IEnumerable<EmployeeViewModel>>(empolyees);
+            var MappedEmps = _mapper.Map<IEnumerable<Empolyee>, IEnumerable<EmployeeViewModel>>(empolyees);
 
             return View(MappedEmps);
 
@@ -68,20 +75,20 @@ namespace Route.C41.G02.PL.Controllers
 
                 // Manual Mapping
 
-               /// var mappedEmp = new Empolyee()
-               /// {
-               ///     Name = empolyeeVM.Name,
-               ///     Age = empolyeeVM.Age,
-               ///     Address = empolyeeVM.Address,
-               ///     Salary = empolyeeVM.Salary,
-               ///     Email = empolyeeVM.Email,
-               ///     PhoneNumber = empolyeeVM.PhoneNumber,
-               ///     IsActive = empolyeeVM.IsActive,
-               ///     HiringDate =  empolyeeVM.HiringDate,
-               ///
-               ///
-               /// };
-               /// 
+                /// var mappedEmp = new Empolyee()
+                /// {
+                ///     Name = empolyeeVM.Name,
+                ///     Age = empolyeeVM.Age,
+                ///     Address = empolyeeVM.Address,
+                ///     Salary = empolyeeVM.Salary,
+                ///     Email = empolyeeVM.Email,
+                ///     PhoneNumber = empolyeeVM.PhoneNumber,
+                ///     IsActive = empolyeeVM.IsActive,
+                ///     HiringDate =  empolyeeVM.HiringDate,
+                ///
+                ///
+                /// };
+                /// 
 
 
 
@@ -89,21 +96,25 @@ namespace Route.C41.G02.PL.Controllers
 
 
 
-              var mappedEmp = _mapper.Map<EmployeeViewModel,Empolyee>(empolyeeVM);
-               
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVM);
 
-                var count = _employeesRepo.Add(mappedEmp);
+
+                 _uniitOfWork.EmployeeRepository.Add(mappedEmp);
+                var count = _uniitOfWork.Complete();
                 if (count > 0)
                 {
-                    TempData["Message"] = "Employee Created Successfully";
 
-                }
-                else
-                {
-                    TempData["Message"] = "Error, Employee Is Not Created :(";
+                    //1. Update Project
 
+
+                    //2. Delete Department
+                    //_uniitOfWork.DepartmentRepository.Delete()
+
+                    
+
+                    return RedirectToAction("Index");
                 }
-                return RedirectToAction("Index");
+
 
 
             }
@@ -116,7 +127,7 @@ namespace Route.C41.G02.PL.Controllers
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var empolyee = _employeesRepo.Get(id.Value);
+            var empolyee = _uniitOfWork.EmployeeRepository.Get(id.Value);
             var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
 
             if (empolyee is null)
@@ -150,7 +161,8 @@ namespace Route.C41.G02.PL.Controllers
             try
             {
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
-                _employeesRepo.Update(mappedEmp);
+                _uniitOfWork.EmployeeRepository.Update(mappedEmp);
+                _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -183,7 +195,8 @@ namespace Route.C41.G02.PL.Controllers
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
 
 
-                _employeesRepo.Delete(mappedEmp);
+                _uniitOfWork.EmployeeRepository.Delete(mappedEmp);
+                _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
