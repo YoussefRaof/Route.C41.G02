@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
+using Route.C41.G02.BLL.Repositories;
 using Route.C41.G02.PL.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -44,12 +45,13 @@ namespace Route.C41.G02.PL.Controllers
 
             //ViewBag.Message = "Hello View Bag";
             var empolyees = Enumerable.Empty<Empolyee>();
+            var employeeRepo = _uniitOfWork.Repository<Empolyee>() as EmployeeRepository;
             if (string.IsNullOrEmpty(SearchInp))
-                empolyees = _uniitOfWork.EmployeeRepository.GetAll();
+                empolyees = employeeRepo.GetAll();
 
 
             else
-                empolyees = _uniitOfWork.EmployeeRepository.SearchByName(SearchInp.ToLower());
+                empolyees = employeeRepo.SearchByName(SearchInp.ToLower());
 
             var MappedEmps = _mapper.Map<IEnumerable<Empolyee>, IEnumerable<EmployeeViewModel>>(empolyees);
 
@@ -99,7 +101,7 @@ namespace Route.C41.G02.PL.Controllers
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVM);
 
 
-                 _uniitOfWork.EmployeeRepository.Add(mappedEmp);
+                 _uniitOfWork.Repository<Empolyee>().Add(mappedEmp);
                 var count = _uniitOfWork.Complete();
                 if (count > 0)
                 {
@@ -108,7 +110,7 @@ namespace Route.C41.G02.PL.Controllers
 
 
                     //2. Delete Department
-                    //_uniitOfWork.DepartmentRepository.Delete()
+                    //_uniitOfWork.Repository<Department>().Delete()
 
                     
 
@@ -127,7 +129,7 @@ namespace Route.C41.G02.PL.Controllers
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var empolyee = _uniitOfWork.EmployeeRepository.Get(id.Value);
+            var empolyee = _uniitOfWork.Repository<Empolyee>().Get(id.Value);
             var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
 
             if (empolyee is null)
@@ -161,7 +163,7 @@ namespace Route.C41.G02.PL.Controllers
             try
             {
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
-                _uniitOfWork.EmployeeRepository.Update(mappedEmp);
+                _uniitOfWork.Repository<Empolyee>().Update(mappedEmp);
                 _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
@@ -195,7 +197,7 @@ namespace Route.C41.G02.PL.Controllers
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
 
 
-                _uniitOfWork.EmployeeRepository.Delete(mappedEmp);
+                _uniitOfWork.Repository<Empolyee>().Delete(mappedEmp);
                 _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }

@@ -30,7 +30,7 @@ namespace Route.C41.G02.PL.Controllers
         // BaseUrl : Depatment/Index
         public IActionResult Index()
         {
-            var departments = _uniitOfWork.DepartmentRepository.GetAll();
+            var departments = _uniitOfWork.Repository<Department>().GetAll();
             var MappedDeps = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(departments);
             return View(MappedDeps);
         }
@@ -48,7 +48,7 @@ namespace Route.C41.G02.PL.Controllers
             if (ModelState.IsValid) // Server Side Validation
             {
                 var MappedDep = _mapper.Map<DepartmentViewModel,Department>(departmentVm);
-                 _uniitOfWork.DepartmentRepository.Add(MappedDep);
+                 _uniitOfWork.Repository<Department>().Add(MappedDep);
                 var count = _uniitOfWork.Complete();
                 if (count > 0)
                 {
@@ -65,7 +65,7 @@ namespace Route.C41.G02.PL.Controllers
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var department = _uniitOfWork.DepartmentRepository.Get(id.Value);
+            var department = _uniitOfWork.Repository<Department>().Get(id.Value);
             var MappedDep = _mapper.Map<Department, DepartmentViewModel>(department);
 
 
@@ -109,7 +109,7 @@ namespace Route.C41.G02.PL.Controllers
             {
                 var MappedEmp = _mapper.Map<DepartmentViewModel, Department>(departmentVm);
 
-                _uniitOfWork.DepartmentRepository.Update(MappedEmp);
+                _uniitOfWork.Repository<Department>().Update(MappedEmp);
                 _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
@@ -142,7 +142,7 @@ namespace Route.C41.G02.PL.Controllers
             try
             {
                 var Mapped = _mapper.Map<DepartmentViewModel, Department>(departmentVm);
-                _uniitOfWork.DepartmentRepository.Delete(Mapped);
+                _uniitOfWork.Repository<Department>().Delete(Mapped);
                 _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
