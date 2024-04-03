@@ -45,6 +45,8 @@ namespace Route.C41.G02.PL
             });
 
             services.AddApplicationServices();
+
+
             
             
         }
