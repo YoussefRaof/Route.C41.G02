@@ -22,5 +22,10 @@ namespace Route.C41.G02.BLL.Repositories
         {
             return _dbContext.Empolyees.Where(E => E.Address.ToLower() == Address.ToLower()); 
         }
+
+        public IQueryable<Empolyee> SearchByName(string name)
+        {
+           return _dbContext.Empolyees.Where(E => E.Name.ToLower().Contains(name));
+        }
     }
 }

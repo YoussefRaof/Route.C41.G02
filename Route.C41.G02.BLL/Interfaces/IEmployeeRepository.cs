@@ -11,6 +11,7 @@ namespace Route.C41.G02.BLL.Interfaces
 {
     public interface IEmployeeRepository:IGenericRepository<Empolyee>
     {
+        IQueryable<Empolyee> SearchByName(string name);
 
         IQueryable<Empolyee> GetEmployeeByAddress(string Address); 
     }

@@ -1,50 +1,126 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
+using Route.C41.G02.BLL.Repositories;
+using Route.C41.G02.PL.ViewModels;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Route.C41.G02.PL.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepository _employeesRepo;  //NULL
+        private readonly IMapper _mapper;
+        private readonly IUniitOfWork _uniitOfWork;
+        //private readonly IEmployeeRepository _employeesRepo;  //NULL
+        //private readonly IDepartmentRepository _departmentRepo;
         private readonly IWebHostEnvironment _env;
 
-        public EmployeeController(IEmployeeRepository employeesRepo, IWebHostEnvironment env) //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+        public EmployeeController(IMapper mapper,
+            IUniitOfWork uniitOfWork,
+            //IEmployeeRepository employeesRepo,
+            /*IDepartmentRepository departmentRepo, */
+            IWebHostEnvironment env) 
+            //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
-            _employeesRepo = employeesRepo;
+            _mapper = mapper;
+            _uniitOfWork = uniitOfWork;
+            //_employeesRepo = employeesRepo;
+            //_departmentRepo = departmentRepo;
             _env = env;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string SearchInp)
         {
-            var departments = _employeesRepo.GetAll();
-            return View(departments);
+            TempData.Keep();
+            // Binding Through View Dictionary : Transfer Extra Data From Action To Viee [One Way]
+
+            // 1. ViewData
+            //ViewData["Message"] = "Hello From Index";
+
+            //ViewBag.Message = "Hello View Bag";
+            var empolyees = Enumerable.Empty<Empolyee>();
+            var employeeRepo = _uniitOfWork.Repository<Empolyee>() as EmployeeRepository;
+            if (string.IsNullOrEmpty(SearchInp))
+                empolyees = employeeRepo.GetAll();
+
+
+            else
+                empolyees = employeeRepo.SearchByName(SearchInp.ToLower());
+
+            var MappedEmps = _mapper.Map<IEnumerable<Empolyee>, IEnumerable<EmployeeViewModel>>(empolyees);
+
+            return View(MappedEmps);
+
+
         }
 
         [HttpGet]
         public IActionResult Create()
         {
+            //ViewData["Departments"] = _departmentRepo.GetAll();
+            //ViewBag.Departments = _departmentRepo.GetAll(); ;
             return View();
         }
 
         [HttpPost]
 
-        public IActionResult Create(Empolyee empolyee)
+        public IActionResult Create(EmployeeViewModel empolyeeVM)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                var count = _employeesRepo.Add(empolyee);
+
+                // Manual Mapping
+
+                /// var mappedEmp = new Empolyee()
+                /// {
+                ///     Name = empolyeeVM.Name,
+                ///     Age = empolyeeVM.Age,
+                ///     Address = empolyeeVM.Address,
+                ///     Salary = empolyeeVM.Salary,
+                ///     Email = empolyeeVM.Email,
+                ///     PhoneNumber = empolyeeVM.PhoneNumber,
+                ///     IsActive = empolyeeVM.IsActive,
+                ///     HiringDate =  empolyeeVM.HiringDate,
+                ///
+                ///
+                /// };
+                /// 
+
+
+
+
+
+
+
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVM);
+
+
+                 _uniitOfWork.Repository<Empolyee>().Add(mappedEmp);
+                var count = _uniitOfWork.Complete();
                 if (count > 0)
                 {
+
+                    //1. Update Project
+
+
+                    //2. Delete Department
+                    //_uniitOfWork.Repository<Department>().Delete()
+
+                    
+
                     return RedirectToAction("Index");
                 }
 
 
+
             }
-            return View(empolyee);
+            return View(empolyeeVM);
         }
 
         [HttpGet]
@@ -53,12 +129,13 @@ namespace Route.C41.G02.PL.Controllers
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var empolyee = _employeesRepo.Get(id.Value);
+            var empolyee = _uniitOfWork.Repository<Empolyee>().Get(id.Value);
+            var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
 
             if (empolyee is null)
                 return NotFound(); // 404
 
-            return View(empolyee);
+            return View(mappedEmp);
 
         }
 
@@ -66,7 +143,8 @@ namespace Route.C41.G02.PL.Controllers
 
         public IActionResult Edit(int? id)
         {
-
+            //ViewData["Departments"] = _departmentRepo.GetAll();
+            //ViewBag.Departments = _departmentRepo.GetAll(); ;
 
 
             return Details(id, "Edit");
@@ -75,16 +153,18 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Empolyee empolyee)
+        public IActionResult Edit([FromRoute] int id, EmployeeViewModel empolyeeVm)
         {
-            if (id != empolyee.Id)
+            if (id != empolyeeVm.Id)
                 return BadRequest();
             if (!ModelState.IsValid)
-                return View(empolyee);
+                return View(empolyeeVm);
 
             try
             {
-                _employeesRepo.Update(empolyee);
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
+                _uniitOfWork.Repository<Empolyee>().Update(mappedEmp);
+                _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -97,7 +177,7 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Updating Employee");
 
 
-                return View(empolyee);
+                return View(empolyeeVm);
 
             }
         }
@@ -110,11 +190,15 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult Delete(Empolyee empolyee)
+        public IActionResult Delete(EmployeeViewModel empolyeeVm)
         {
             try
             {
-                _employeesRepo.Delete(empolyee);
+                var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
+
+
+                _uniitOfWork.Repository<Empolyee>().Delete(mappedEmp);
+                _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -127,7 +211,7 @@ namespace Route.C41.G02.PL.Controllers
                     ModelState.AddModelError(string.Empty, "Error Occured During Deleting Department");
 
 
-                return View(empolyee);
+                return View(empolyeeVm);
 
             }
         }
