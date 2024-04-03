@@ -62,6 +62,7 @@
         <thead>
 
             <tr>
+                <th>Image</th>
                 <th>@Html.DisplayNameFor(D => D.Name)</th>
                 <th>@Html.DisplayNameFor(D => D.Age)</th>
                 <th>@Html.DisplayNameFor(D => D.Department)</th>
@@ -80,6 +81,11 @@
             @foreach (var empolyee in Model)
             {
                 <tr>
+                    <td>
+
+                        <img src="~/files/images/@empolyee.ImageName" width="75" class="img-fluid rounded-circle" alt="Employee Image" />
+
+                    </td>
                     <td>@empolyee.Name</td>
                     <td>@empolyee.Age</td>
                     <td>@empolyee.Department?.Name</td>
