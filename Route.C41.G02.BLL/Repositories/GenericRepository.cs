@@ -36,24 +36,24 @@ namespace Route.C41.G02.BLL.Repositories
          
         
 
-        public T Get(int id)
+        public async Task<T> GetAsync(int id)
         {
             ///var Empolyee = _dbContext.Empolyees.Local.Where(D=> D.Id == id).FirstOrDefault();
             ///if(Empolyee is null)
             ///    Empolyee = _dbContext.Empolyees.Where(D => D.Id == id).FirstOrDefault();
 
-            return _dbContext.Find<T>(id); ;
+            return await _dbContext.FindAsync<T>(id); ;
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             if(typeof(T) == typeof(Empolyee))
             {
-               return (IEnumerable<T>) _dbContext.Empolyees.Include(E => E.Department).AsNoTracking().ToList();
+               return (IEnumerable<T>) await _dbContext.Empolyees.Include(E => E.Department).AsNoTracking().ToListAsync();
             }
             else
             {
-                return _dbContext.Set<T>().AsNoTracking().ToList();
+                return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
             }
         }
             

@@ -8,6 +8,7 @@ using Route.C41.G02.BLL.Repositories;
 using Route.C41.G02.PL.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Route.C41.G02.PL.Controllers
 {
@@ -28,9 +29,9 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         // BaseUrl : Depatment/Index
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var departments = _uniitOfWork.Repository<Department>().GetAll();
+            var departments = await _uniitOfWork.Repository<Department>().GetAllAsync();
             var MappedDeps = _mapper.Map<IEnumerable<Department>, IEnumerable<DepartmentViewModel>>(departments);
             return View(MappedDeps);
         }
@@ -43,13 +44,13 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(DepartmentViewModel departmentVm)
+        public async Task<IActionResult> Create(DepartmentViewModel departmentVm)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
                 var MappedDep = _mapper.Map<DepartmentViewModel,Department>(departmentVm);
                  _uniitOfWork.Repository<Department>().Add(MappedDep);
-                var count = _uniitOfWork.Complete();
+                var count = await _uniitOfWork.Complete();
                 if (count > 0)
                 {
                     return RedirectToAction("Index");
@@ -60,12 +61,12 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id, string viewname = "Details")
+        public async Task<IActionResult> Details(int? id, string viewname = "Details")
         {
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var department = _uniitOfWork.Repository<Department>().Get(id.Value);
+            var department = await _uniitOfWork.Repository<Department>().GetAsync(id.Value);
             var MappedDep = _mapper.Map<Department, DepartmentViewModel>(department);
 
 
@@ -79,7 +80,7 @@ namespace Route.C41.G02.PL.Controllers
         [HttpGet]
         // /Department/Edit/10
         // /Department/Edit/
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             ///if(!id.HasValue)
             ///    return BadRequest();
@@ -92,7 +93,7 @@ namespace Route.C41.G02.PL.Controllers
             ///return View(department);
 
 
-            return Details(id, "Edit");
+            return await Details(id, "Edit");
 
         }
 
@@ -131,9 +132,9 @@ namespace Route.C41.G02.PL.Controllers
         //: /Department/Delete/10
         //: /Department/Delete/
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            return Details(id, "Delete");
+            return await Details(id, "Delete");
         }
 
         [HttpPost]

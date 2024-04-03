@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
 
 namespace Route.C41.G02.PL.Controllers
 {
@@ -37,7 +38,7 @@ namespace Route.C41.G02.PL.Controllers
             _env = env;
         }
 
-        public IActionResult Index(string SearchInp)
+         public async Task <IActionResult> Index(string SearchInp)
         {
             TempData.Keep();
             // Binding Through View Dictionary : Transfer Extra Data From Action To Viee [One Way]
@@ -49,7 +50,7 @@ namespace Route.C41.G02.PL.Controllers
             var empolyees = Enumerable.Empty<Empolyee>();
             var employeeRepo = _uniitOfWork.Repository<Empolyee>() as EmployeeRepository;
             if (string.IsNullOrEmpty(SearchInp))
-                empolyees = employeeRepo.GetAll();
+                empolyees = await employeeRepo.GetAllAsync();
 
 
             else
@@ -72,11 +73,11 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpPost]
 
-        public IActionResult Create(EmployeeViewModel empolyeeVM)
+        public async Task<IActionResult> Create(EmployeeViewModel empolyeeVM)
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                empolyeeVM.ImageName = DocumentSetting.UploadFile(empolyeeVM.Image, "images");
+                empolyeeVM.ImageName = await DocumentSetting.UploadFile(empolyeeVM.Image, "images");
 
 
                 // Manual Mapping
@@ -106,7 +107,7 @@ namespace Route.C41.G02.PL.Controllers
 
 
                 _uniitOfWork.Repository<Empolyee>().Add(mappedEmp);
-                var count = _uniitOfWork.Complete();
+                var count = await _uniitOfWork.Complete();
                 if (count > 0)
                 {
 
@@ -128,12 +129,12 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int? id, string viewname = "Details")
+        public async Task<IActionResult> Details(int? id, string viewname = "Details")
         {
             if (!id.HasValue)
                 return BadRequest(); //400
 
-            var empolyee = _uniitOfWork.Repository<Empolyee>().Get(id.Value);
+            var empolyee = await _uniitOfWork.Repository<Empolyee>().GetAsync(id.Value);
             //var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
 
             if (viewname.Equals("Delete", StringComparison.OrdinalIgnoreCase))
@@ -148,19 +149,19 @@ namespace Route.C41.G02.PL.Controllers
 
         [HttpGet]
 
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             //ViewData["Departments"] = _departmentRepo.GetAll();
             //ViewBag.Departments = _departmentRepo.GetAll(); ;
 
 
-            return Details(id, "Edit");
+            return await Details(id, "Edit");
 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, EmployeeViewModel empolyeeVm)
+        public async Task<IActionResult> Edit([FromRoute] int id, EmployeeViewModel empolyeeVm)
         {
             if (id != empolyeeVm.Id)
                 return BadRequest();
@@ -171,7 +172,7 @@ namespace Route.C41.G02.PL.Controllers
             {
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
                 _uniitOfWork.Repository<Empolyee>().Update(mappedEmp);
-                _uniitOfWork.Complete();
+               await _uniitOfWork.Complete();
                 return RedirectToAction("Index");
             }
             catch (Exception Ex)
@@ -190,14 +191,14 @@ namespace Route.C41.G02.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            return Details(id, "Delete");
+            return await Details(id, "Delete");
 
         }
 
         [HttpPost]
-        public IActionResult Delete(EmployeeViewModel empolyeeVm)
+        public async Task<IActionResult> Delete(EmployeeViewModel empolyeeVm)
         {
             try
             {
@@ -206,7 +207,7 @@ namespace Route.C41.G02.PL.Controllers
 
 
                 _uniitOfWork.Repository<Empolyee>().Delete(mappedEmp);
-                var count = _uniitOfWork.Complete();
+                var count = await _uniitOfWork.Complete();
                 if (count > 0)
                 {
                     DocumentSetting.DeleteFile(empolyeeVm.ImageName, "images");
