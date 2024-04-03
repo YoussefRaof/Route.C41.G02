@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace Route.C41.G02.PL.ViewModels
 {
@@ -44,7 +45,8 @@ namespace Route.C41.G02.PL.ViewModels
         public EmpType EmployeeType { get; set; }
 
 
-      
+        public IFormFile Image{ get; set; }
+        public string ImageName { get; set; }
 
         //[ForeignKey("DepartmentId")]
         public int? DepartmentId1 { get; set; } // Foregin Key Column

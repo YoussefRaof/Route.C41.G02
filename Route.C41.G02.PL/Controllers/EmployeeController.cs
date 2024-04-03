@@ -6,10 +6,12 @@ using Microsoft.Extensions.Hosting;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.BLL.Interfaces;
 using Route.C41.G02.BLL.Repositories;
+using Route.C41.G02.PL.Helpers;
 using Route.C41.G02.PL.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Route.C41.G02.PL.Controllers
 {
@@ -74,6 +76,8 @@ namespace Route.C41.G02.PL.Controllers
         {
             if (ModelState.IsValid) // Server Side Validation
             {
+                empolyeeVM.ImageName =DocumentSetting.UploadFile(empolyeeVM.Image, "images");
+                
 
                 // Manual Mapping
 

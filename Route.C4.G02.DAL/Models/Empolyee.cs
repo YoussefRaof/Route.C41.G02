@@ -64,6 +64,8 @@ namespace Route.C4.G02.DAL.Models
 
         public bool IsDeleted { get; set; } = false;
 
+        public string ImageName { get; set; }
+
         //[ForeignKey("DepartmentId")]
         public int? DepartmentId1 { get; set; } // Foregin Key Column
 
