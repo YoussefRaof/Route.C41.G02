@@ -27,8 +27,8 @@ namespace Route.C41.G02.PL.Controllers
             IUniitOfWork uniitOfWork,
             //IEmployeeRepository employeesRepo,
             /*IDepartmentRepository departmentRepo, */
-            IWebHostEnvironment env) 
-            //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
+            IWebHostEnvironment env)
+        //Ask CLR For Creation Of Object From Class Impelmenting "IDepartmentRepository"
         {
             _mapper = mapper;
             _uniitOfWork = uniitOfWork;
@@ -76,8 +76,8 @@ namespace Route.C41.G02.PL.Controllers
         {
             if (ModelState.IsValid) // Server Side Validation
             {
-                empolyeeVM.ImageName =DocumentSetting.UploadFile(empolyeeVM.Image, "images");
-                
+                empolyeeVM.ImageName = DocumentSetting.UploadFile(empolyeeVM.Image, "images");
+
 
                 // Manual Mapping
 
@@ -105,7 +105,7 @@ namespace Route.C41.G02.PL.Controllers
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVM);
 
 
-                 _uniitOfWork.Repository<Empolyee>().Add(mappedEmp);
+                _uniitOfWork.Repository<Empolyee>().Add(mappedEmp);
                 var count = _uniitOfWork.Complete();
                 if (count > 0)
                 {
@@ -116,13 +116,13 @@ namespace Route.C41.G02.PL.Controllers
                     //2. Delete Department
                     //_uniitOfWork.Repository<Department>().Delete()
 
-                    
+
 
                     return RedirectToAction("Index");
                 }
 
 
-
+                
             }
             return View(empolyeeVM);
         }
@@ -134,12 +134,15 @@ namespace Route.C41.G02.PL.Controllers
                 return BadRequest(); //400
 
             var empolyee = _uniitOfWork.Repository<Empolyee>().Get(id.Value);
-            var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
+            //var mappedEmp = _mapper.Map<Empolyee, EmployeeViewModel>(empolyee);
+
+            if (viewname.Equals("Delete", StringComparison.OrdinalIgnoreCase))
+                TempData["ImageName"] = empolyee.ImageName;
 
             if (empolyee is null)
                 return NotFound(); // 404
 
-            return View(mappedEmp);
+            return View(viewname, _mapper.Map<Empolyee, EmployeeViewModel>(empolyee));
 
         }
 
@@ -198,12 +201,19 @@ namespace Route.C41.G02.PL.Controllers
         {
             try
             {
+                empolyeeVm.ImageName = TempData["ImageName"] as string;
                 var mappedEmp = _mapper.Map<EmployeeViewModel, Empolyee>(empolyeeVm);
 
 
                 _uniitOfWork.Repository<Empolyee>().Delete(mappedEmp);
-                _uniitOfWork.Complete();
-                return RedirectToAction("Index");
+                var count = _uniitOfWork.Complete();
+                if (count > 0)
+                {
+                    DocumentSetting.DeleteFile(empolyeeVm.ImageName, "images");
+                    return RedirectToAction("Index");
+
+                }
+                return View(empolyeeVm);
             }
             catch (Exception Ex)
             {
