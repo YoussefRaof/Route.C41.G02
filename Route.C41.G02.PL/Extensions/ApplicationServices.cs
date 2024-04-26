@@ -43,8 +43,31 @@ namespace Route.C41.G02.PL.Extensions
 
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //services.AddAuthentication(); Called Automtically When calling AddIdentity & Add Authentication Used To Register 3 main Services Of Security Module
+            services.AddAuthentication(options =>
+            {
+                //options.DefaultAuthenticateScheme = "Identity.Application";
+            }).AddCookie("Hamda",options =>
+            {
+				options.AccessDeniedPath = "/Home/Error";
+				options.ExpireTimeSpan = TimeSpan.FromDays(2);
+				options.LoginPath = "/Account/SignIn";
+
+			});
                 
+
+            // services.AddAuthentication() //Called Automtically When calling AddIdentity &
+            //Add Authentication Used To Register 3 main Services Of Security Module
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath="/Home/Error";
+                options.ExpireTimeSpan = TimeSpan.FromDays(2);
+                options.LoginPath = "/Account/SignIn";
+            });
+
+
+
+
 
 
             return services;

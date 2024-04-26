@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Route.C4.G02.DAL.Models;
 using Route.C41.G02.PL.ViewModels.Account;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Route.C41.G02.PL.Controllers
 {
+	
 	public class AccountController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;

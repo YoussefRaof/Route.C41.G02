@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -12,9 +13,10 @@ using System.Threading.Tasks;
 
 namespace Route.C41.G02.PL.Controllers
 {
-    // Inheritance: DepartmentController Is A Controller
-    // Compostion: DepartmentController Has A DepartmentRepository
-    public class DepartmentController : Controller
+	[Authorize]
+	// Inheritance: DepartmentController Is A Controller
+	// Compostion: DepartmentController Has A DepartmentRepository
+	public class DepartmentController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IUniitOfWork _uniitOfWork;
