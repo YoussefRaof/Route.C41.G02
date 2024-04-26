@@ -43,7 +43,7 @@ namespace Route.C41.G02.PL.Extensions
 
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //services.AddAuthentication();
+            //services.AddAuthentication(); Called Automtically When calling AddIdentity & Add Authentication Used To Register 3 main Services Of Security Module
                 
 
 
